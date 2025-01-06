@@ -1,6 +1,12 @@
 {
     "compilerOptions": {
-      "typeRoots": ["node_modules/@types", "node_modules/@stackbit/types"]
-    }
+      "target": "es6",
+      "module": "commonjs",
+      "strict": true,
+      "esModuleInterop": true,
+      "typeRoots": ["./node_modules/@types"],
+      "moduleResolution": "node"
+    },
+    "include": ["**/*.ts"],
+    "exclude": ["node_modules"]
   }
-  

@@ -1,10 +1,20 @@
 {
+  "name": "amanitateam",
+  "version": "1.0.0",
+  "description": "A description of your project",
+  "main": "index.js",
+  "scripts": {
+    "dev": "vite",
+    "build": "vite build",
+    "start": "vite preview"
+  },
   "dependencies": {
-    "netlify-cms-app": "^2.15.72",
+    "@redux-devtools/extension": "^3.3.0",
     "uuid": "^11.0.4"
   },
   "devDependencies": {
-    "@redux-devtools/extension": "^3.3.0",
-    "@stackbit/types": "^2.1.12"
+    "@stackbit/types": "^2.1.12",
+    "typescript": "^5.7.2",
+    "vite": "^6.0.7"
   }
 }

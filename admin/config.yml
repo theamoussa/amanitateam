@@ -1,15 +1,15 @@
 backend:
   name: git-gateway
   branch: main
-  identity: true
 
-media_folder: "static/uploads"
+media_folder: "uploads" # Adjust as needed
 public_folder: "/uploads"
 
 collections:
   - name: "calendar"
     label: "Calendar"
-    file: "data/calendar.json"
+    folder: "data"
+    create: true
     fields:
-      - { label: "Event", name: "event", widget: "string" }
       - { label: "Date", name: "date", widget: "datetime" }
+      - { label: "Event", name: "event", widget: "string" }
