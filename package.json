@@ -3,11 +3,6 @@
   "version": "1.0.0",
   "description": "A description of your project",
   "main": "index.js",
-  "scripts": {
-    "dev": "vite",
-    "build": "vite build",
-    "start": "vite preview"
-  },
   "dependencies": {
     "@contentlayer/experimental-source-files-stackbit": "^0.3.4",
     "@redux-devtools/extension": "^3.3.0",
@@ -21,5 +16,10 @@
     "@types/node": "^22.10.5",
     "typescript": "^5.7.2",
     "vite": "^6.0.7"
+  },
+  "scripts": {
+    "dev": "next dev",
+    "build": "next build",
+    "start": "next start"
   }
 }

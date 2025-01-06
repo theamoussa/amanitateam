@@ -10,19 +10,12 @@ if (!spaceId || !environment || !previewToken || !accessToken) {
   throw new Error('Missing required environment variables for Contentful.');
 }
 
-export default {
-  stackbitVersion: '~0.6.0',
-  ssgName: 'nextjs',
-  nodeVersion: '16',
-  contentSources: [
-    new ContentfulContentSource({
-      spaceId: spaceId,  // Now guaranteed to be a string
-      environment: environment,  // Now guaranteed to be a string
-      previewToken: previewToken,  // Now guaranteed to be a string
-      accessToken: accessToken,  // Now guaranteed to be a string
-    }),
-  ],
-  models: {
-    page: { type: 'page', urlPath: '/{slug}' },
-  },
-}
+import { defineStackbitConfig } from '@stackbit/types';
+
+export default defineStackbitConfig({
+  stackbitVersion: '~0.5.0',
+  ssgName: 'nextjs',  // Replace with your SSG framework
+  nodeVersion: '18',
+  devCommand: 'npm run dev',  // Ensure the correct dev command
+  buildCommand: 'npm run build',
+});
