@@ -3,7 +3,7 @@
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>2025 Holiday Tracker</title>
+  <title>2025 Vacation Tracker</title>
   <style>
     body {
       font-family: Arial, sans-serif;
@@ -44,6 +44,7 @@
     }
     td {
       cursor: pointer;
+      position: relative;
     }
     td.full {
       background-color: #a3e4d7;
@@ -54,6 +55,11 @@
     td.holiday {
       background-color: #ffcccb;
       cursor: not-allowed;
+    }
+    td::after {
+      content: attr(data-code);
+      display: inline-block;
+      margin-left: 5px;
     }
     .summary {
       margin: 20px auto;
@@ -67,17 +73,36 @@
       margin-bottom: 10px;
       font-size: 16px;
     }
+    .legend {
+      margin-top: 20px;
+      padding: 10px;
+      border: 1px solid #ddd;
+      border-radius: 8px;
+      background-color: #fff;
+      box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+    }
+    .legend-item {
+      margin: 5px 0;
+    }
   </style>
 </head>
 <body>
 
-<h1>2025 Holiday Tracker</h1>
+<h1>2025 Vacation Tracker</h1>
 
 <div id="calendar"></div>
 
 <div class="summary">
   <h2>Summary</h2>
   <div id="employeeSummary"></div>
+</div>
+
+<div class="legend">
+  <h3>Legend</h3>
+  <div class="legend-item"><span style="background-color: #ffcccb; padding: 2px 6px;">H</span> - Preset Holiday</div>
+  <div class="legend-item"><span style="background-color: #a3e4d7; padding: 2px 6px;">V</span> - Full Vacation Day</div>
+  <div class="legend-item"><span style="background-color: #f9e79f; padding: 2px 6px;">V1</span> - Morning Half-Day Vacation</div>
+  <div class="legend-item"><span style="background-color: #f9e79f; padding: 2px 6px;">V2</span> - Afternoon Half-Day Vacation</div>
 </div>
 
 <script>
@@ -91,10 +116,10 @@
 
   const teamHolidays = {
     Italy: [
-      '2025-01-01', '2025-04-25', '2025-12-25' // Example holidays for Italy
+      '2025-01-01', '2025-04-25', '2025-12-25', '2025-06-02', '2025-08-15' // Example holidays for Italy
     ],
     US: [
-      '2025-07-04', '2025-11-27', '2025-12-25' // Example holidays for US
+      '2025-07-04', '2025-11-27', '2025-12-25', '2025-01-20', '2025-05-27' // Example holidays for US
     ]
   };
 
@@ -147,14 +172,19 @@
           const cell = document.createElement('td');
           cell.dataset.date = date;
           cell.dataset.name = name;
+          cell.dataset.code = '';
 
           // Mark team-specific preset holidays
           if (data.team === 'Italy' && teamHolidays.Italy.includes(date)) {
             cell.classList.add('holiday');
+            cell.dataset.code = 'H';
           } else if (data.team === 'US' && teamHolidays.US.includes(date)) {
             cell.classList.add('holiday');
+            cell.dataset.code = 'H';
           } else {
-            cell.addEventListener('click', handleDayClick);
+            cell.addEventListener('mousedown', handleDaySelectionStart);
+            cell.addEventListener('mouseover', handleDaySelectionHover);
+            cell.addEventListener('mouseup', handleDaySelectionEnd);
           }
 
           row.appendChild(cell);
@@ -169,47 +199,26 @@
     updateSummary();
   }
 
-  function handleDayClick(event) {
-    const cell = event.target;
-    const name = cell.dataset.name;
+  let isSelecting = false;
+  let selectedCells = [];
 
-    if (employees[name]) {
-      if (cell.classList.contains('full')) {
-        employees[name].days -= 1;
-        cell.classList.remove('full');
-      } else if (cell.classList.contains('half')) {
-        employees[name].days -= 0.5;
-        cell.classList.remove('half');
-      } else {
-        const type = prompt('Enter "full" for a full day or "half" for a half day:');
-        if (type === 'full') {
-          employees[name].days += 1;
-          cell.classList.add('full');
-        } else if (type === 'half') {
-          employees[name].days += 0.5;
-          cell.classList.add('half');
-        } else {
-          alert('Invalid input. Please enter "full" or "half".');
-        }
-      }
-    }
-
-    updateSummary();
-  }
-
-  function updateSummary() {
-    const summary = document.getElementById('employeeSummary');
-    summary.innerHTML = '';
-    for (const [name, data] of Object.entries(employees)) {
-      const div = document.createElement('div');
-      div.classList.add('employee-summary');
-      div.innerText = `${name} (${data.team} team): ${data.days} days`;
-      summary.appendChild(div);
+  function handleDaySelectionStart(event) {
+    if (event.buttons === 1) { // Left mouse button only
+      isSelecting = true;
+      selectedCells = [event.target];
+      event.target.classList.add('selected');
     }
   }
 
-  createCalendar(2025);
-</script>
+  function handleDaySelectionHover(event) {
+    if (isSelecting) {
+      selectedCells.push(event.target);
+      event.target.classList.add('selected');
+    }
+  }
 
-</body>
-</html>
+  function handleDaySelectionEnd() {
+    if (isSelecting) {
+      isSelecting = false;
+      selectedCells.forEach(cell => {
+        if (!cell
