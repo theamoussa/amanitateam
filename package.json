@@ -9,11 +9,15 @@
     "start": "vite preview"
   },
   "dependencies": {
+    "@contentlayer/experimental-source-files-stackbit": "^0.3.4",
     "@redux-devtools/extension": "^3.3.0",
+    "@stackbit/cms-contentful": "^1.0.30",
+    "contentlayer": "^0.3.4",
     "uuid": "^11.0.4"
   },
   "devDependencies": {
     "@stackbit/types": "^2.1.12",
+    "@types/node": "^22.10.5",
     "typescript": "^5.7.2",
     "vite": "^6.0.7"
   }

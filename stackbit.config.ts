@@ -1,16 +1,28 @@
-import { defineStackbitConfig } from '@stackbit/types';
+import { ContentfulContentSource } from '@stackbit/cms-contentful'
 
-export default defineStackbitConfig({
-  stackbitVersion: '~0.5.0',
+const spaceId = process.env.CONTENTFUL_SPACE_ID;
+const environment = process.env.CONTENTFUL_ENVIRONMENT;
+const previewToken = process.env.CONTENTFUL_PREVIEW_TOKEN;
+const accessToken = process.env.CONTENTFUL_MANAGEMENT_TOKEN;
 
+// Ensure the environment variables are set
+if (!spaceId || !environment || !previewToken || !accessToken) {
+  throw new Error('Missing required environment variables for Contentful.');
+}
+
+export default {
+  stackbitVersion: '~0.6.0',
+  ssgName: 'nextjs',
+  nodeVersion: '16',
   contentSources: [
-    {
-      repoUrl: 'https://github.com/theamoussa/amanitateam',
-      branch: 'main',
-    },
+    new ContentfulContentSource({
+      spaceId: spaceId,  // Now guaranteed to be a string
+      environment: environment,  // Now guaranteed to be a string
+      previewToken: previewToken,  // Now guaranteed to be a string
+      accessToken: accessToken,  // Now guaranteed to be a string
+    }),
   ],
-
-  devCommand: 'npm run dev',
-  buildCommand: 'npm run build',
-  outputDirectory: 'dist',
-});
+  models: {
+    page: { type: 'page', urlPath: '/{slug}' },
+  },
+}
