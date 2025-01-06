@@ -1,3 +1,8 @@
 [build]
-  publish = "." # The folder where your `index.html` is located
-  command = "" # No build command for plain HTML/JS
+  publish = "." # Root directory where index.html is located
+  command = ""  # No build command needed for static sites
+
+[[redirects]]
+  from = "/*"
+  to = "/index.html"
+  status = 200
