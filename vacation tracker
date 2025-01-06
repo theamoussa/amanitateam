@@ -1,1 +1,210 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>2025 Holiday Tracker</title>
+  <style>
+    body {
+      font-family: Arial, sans-serif;
+      background-color: #f9f9f9;
+      margin: 0;
+      padding: 0;
+    }
+    h1 {
+      text-align: center;
+      color: #333;
+    }
+    #calendar {
+      max-width: 900px;
+      margin: 20px auto;
+      background-color: #fff;
+      padding: 20px;
+      border-radius: 8px;
+      box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+    }
+    .month {
+      margin-bottom: 20px;
+    }
+    .month-name {
+      text-align: center;
+      font-size: 24px;
+      margin-bottom: 10px;
+    }
+    .weekdays, .days {
+      display: grid;
+      grid-template-columns: repeat(7, 1fr);
+    }
+    .weekdays div, .days div {
+      text-align: center;
+      padding: 10px;
+      border: 1px solid #ddd;
+    }
+    .weekdays div {
+      background-color: #f0f0f0;
+      font-weight: bold;
+    }
+    .day {
+      cursor: pointer;
+      background-color: #f9f9f9;
+    }
+    .day:hover {
+      background-color: #e0e0e0;
+    }
+    .day.holiday {
+      background-color: #ffcccb;
+    }
+    .day.vacation-full {
+      background-color: #a3e4d7;
+    }
+    .day.vacation-half {
+      background-color: #f9e79f;
+    }
+    #summary {
+      max-width: 900px;
+      margin: 20px auto;
+      background-color: #fff;
+      padding: 20px;
+      border-radius: 8px;
+      box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+    }
+    .employee-summary {
+      margin-bottom: 10px;
+      font-size: 16px;
+    }
+    button {
+      padding: 10px;
+      margin: 5px;
+      border: none;
+      border-radius: 4px;
+      background-color: #28a745;
+      color: white;
+      cursor: pointer;
+    }
+    button:hover {
+      background-color: #218838;
+    }
+  </style>
+</head>
+<body>
+
+<h1>2025 Holiday Tracker</h1>
+
+<div id="calendar"></div>
+
+<div id="summary">
+  <h2>Summary</h2>
+  <div id="employeeSummary"></div>
+</div>
+
+<button onclick="resetCalendar()">Reset</button>
+
+<script>
+  const employees = {
+    'Théa': { days: 0 },
+    'Employee2': { days: 0 },
+    'Employee3': { days: 0 },
+    'Employee4': { days: 0 },
+    'Employee5': { days: 0 }
+  };
+
+  function createCalendar(year) {
+    const calendar = document.getElementById('calendar');
+    calendar.innerHTML = '';
+
+    for (let month = 0; month < 12; month++) {
+      const firstDay = new Date(year, month, 1);
+      const daysInMonth = new Date(year, month + 1, 0).getDate();
+      const monthDiv = document.createElement('div');
+      monthDiv.classList.add('month');
+
+      const monthName = firstDay.toLocaleString('default', { month: 'long' });
+      const monthHeader = document.createElement('div');
+      monthHeader.classList.add('month-name');
+      monthHeader.innerText = `${monthName} ${year}`;
+      monthDiv.appendChild(monthHeader);
+
+      const weekdaysDiv = document.createElement('div');
+      weekdaysDiv.classList.add('weekdays');
+      ['Sun', 'Mon', 'Tue', 'Wed', 'Thu', 'Fri', 'Sat'].forEach(day => {
+        const dayDiv = document.createElement('div');
+        dayDiv.innerText = day;
+        weekdaysDiv.appendChild(dayDiv);
+      });
+      monthDiv.appendChild(weekdaysDiv);
+
+      const daysDiv = document.createElement('div');
+      daysDiv.classList.add('days');
+
+      for (let i = 0; i < firstDay.getDay(); i++) {
+        daysDiv.appendChild(document.createElement('div'));
+      }
+
+      for (let day = 1; day <= daysInMonth; day++) {
+        const dayDiv = document.createElement('div');
+        dayDiv.classList.add('day');
+        dayDiv.innerText = day;
+        dayDiv.dataset.date = `${year}-${month + 1}-${day}`;
+        dayDiv.addEventListener('click', handleDayClick);
+        daysDiv.appendChild(dayDiv);
+      }
+
+      monthDiv.appendChild(daysDiv);
+      calendar.appendChild(monthDiv);
+    }
+
+    updateSummary();
+  }
+
+  function handleDayClick(event) {
+    const date = event.target.dataset.date;
+    const role = prompt('Enter your role (Admin or Employee Name):');
+
+    if (role.toLowerCase() === 'admin') {
+      event.target.classList.toggle('holiday');
+    } else if (employees[role]) {
+      const type = prompt('Enter "full" for a full day or "half" for a half day:');
+      if (type === 'full') {
+        event.target.classList.remove('vacation-half');
+        event.target.classList.add('vacation-full');
+        employees[role].days += 1;
+      } else if (type === 'half') {
+        event.target.classList.remove('vacation-full');
+        event.target.classList.add('vacation-half');
+        employees[role].days += 0.5;
+      }
+    } else {
+      alert('Invalid role or employee name.');
+    }
+
+    updateSummary();
+  }
+
+  function updateSummary() {
+    const summary = document.getElementById('employeeSummary');
+    summary.innerHTML = '';
+    for (const [name, data] of Object.entries(employees)) {
+      const div = document.createElement('div');
+      div.classList.add('employee-summary');
+      div.innerText = `${name}: ${data.days} days`;
+      summary.appendChild(div);
+    }
+  }
+
+  function resetCalendar() {
+    for (const key in employees) {
+      employees[key].days = 0;
+    }
+    const dayElements = document.querySelectorAll('.day');
+    dayElements.forEach(day => {
+      day.classList.remove('holiday', 'vacation-full', 'vacation-half');
+    });
+    updateSummary();
+  }
+
+  createCalendar(2025);
+</script>
+
+</body>
+</html>
 
