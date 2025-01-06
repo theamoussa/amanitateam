@@ -1,0 +1,3 @@
+[build]
+  publish = "." # The folder where your `index.html` is located
+  command = "" # No build command for plain HTML/JS
