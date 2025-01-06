@@ -1,15 +1,17 @@
 backend:
-  name: git-gateway
-  branch: main
+  name: github  # Or GitLab if you're using GitLab
+  repo: your-github-username/your-repository  # Replace with your GitHub repo
+  branch: main  # This is the branch to use for CMS
 
-media_folder: "uploads" # Adjust as needed
-public_folder: "/uploads"
+media_folder: "static/img"  # Folder where media files will be stored
+public_folder: "/img"  # Public URL to access the media files
 
 collections:
-  - name: "calendar"
-    label: "Calendar"
-    folder: "data"
-    create: true
+  - name: "blog"
+    label: "Blog Posts"
+    folder: "content/blog"  # The folder where your content will be stored
+    create: true  # Allow creating new blog posts
+    slug: "{{year}}-{{month}}-{{day}}-{{slug}}"  # URL format for posts
     fields:
-      - { label: "Date", name: "date", widget: "datetime" }
-      - { label: "Event", name: "event", widget: "string" }
+      - { label: "Title", name: "title", widget: "string" }
+      - { label: "Body", name: "body", widget: "markdown" }
