@@ -72,18 +72,6 @@
       margin-bottom: 10px;
       font-size: 16px;
     }
-    button {
-      padding: 10px;
-      margin: 5px;
-      border: none;
-      border-radius: 4px;
-      background-color: #28a745;
-      color: white;
-      cursor: pointer;
-    }
-    button:hover {
-      background-color: #218838;
-    }
   </style>
 </head>
 <body>
@@ -97,15 +85,26 @@
   <div id="employeeSummary"></div>
 </div>
 
-<button onclick="resetCalendar()">Reset</button>
-
 <script>
   const employees = {
-    'Théa': { days: 0 },
-    'Employee2': { days: 0 },
-    'Employee3': { days: 0 },
-    'Employee4': { days: 0 },
-    'Employee5': { days: 0 }
+    'Thea': { team: 'Italy', days: 0 },
+    'Isabella': { team: 'Italy', days: 0 },
+    'LA': { team: 'US', days: 0 },
+    'Linda': { team: 'US', days: 0 },
+    'Talia': { team: 'US', days: 0 }
+  };
+
+  const teamHolidays = {
+    Italy: [
+      '2025-01-01', // New Year's Day
+      '2025-04-25', // Liberation Day
+      '2025-12-25'  // Christmas
+    ],
+    US: [
+      '2025-07-04', // Independence Day
+      '2025-11-27', // Thanksgiving
+      '2025-12-25'  // Christmas
+    ]
   };
 
   function createCalendar(year) {
@@ -143,8 +142,20 @@
       for (let day = 1; day <= daysInMonth; day++) {
         const dayDiv = document.createElement('div');
         dayDiv.classList.add('day');
-        dayDiv.innerText = day;
-        dayDiv.dataset.date = `${year}-${month + 1}-${day}`;
+        const date = `${year}-${month + 1}-${day}`.replace(/-(\d)(?!\d)/g, '-0$1');
+        dayDiv.dataset.date = date;
+
+        // Mark team-specific preset holidays
+        if (teamHolidays.Italy.includes(date)) {
+          dayDiv.classList.add('holiday');
+          dayDiv.innerText += ' 🇮🇹';
+        }
+        if (teamHolidays.US.includes(date)) {
+          dayDiv.classList.add('holiday');
+          dayDiv.innerText += ' 🇺🇸';
+        }
+
+        dayDiv.innerText += day;
         dayDiv.addEventListener('click', handleDayClick);
         daysDiv.appendChild(dayDiv);
       }
@@ -163,15 +174,28 @@
     if (role.toLowerCase() === 'admin') {
       event.target.classList.toggle('holiday');
     } else if (employees[role]) {
-      const type = prompt('Enter "full" for a full day or "half" for a half day:');
-      if (type === 'full') {
-        event.target.classList.remove('vacation-half');
-        event.target.classList.add('vacation-full');
-        employees[role].days += 1;
-      } else if (type === 'half') {
-        event.target.classList.remove('vacation-full');
-        event.target.classList.add('vacation-half');
-        employees[role].days += 0.5;
+      if (event.target.classList.contains('vacation-full') || event.target.classList.contains('vacation-half')) {
+        // Remove vacation day
+        if (event.target.classList.contains('vacation-full')) {
+          employees[role].days -= 1;
+        } else {
+          employees[role].days -= 0.5;
+        }
+        event.target.classList.remove('vacation-full', 'vacation-half');
+        alert(`${role}'s vacation on ${date} has been removed.`);
+      } else {
+        const type = prompt('Enter "full" for a full day or "half" for a half day:');
+        if (type === 'full') {
+          event.target.classList.add('vacation-full');
+          employees[role].days += 1;
+          alert(`${role} marked a full-day vacation on ${date}.`);
+        } else if (type === 'half') {
+          event.target.classList.add('vacation-half');
+          employees[role].days += 0.5;
+          alert(`${role} marked a half-day vacation on ${date}.`);
+        } else {
+          alert('Invalid input. Please enter "full" or "half".');
+        }
       }
     } else {
       alert('Invalid role or employee name.');
@@ -186,20 +210,9 @@
     for (const [name, data] of Object.entries(employees)) {
       const div = document.createElement('div');
       div.classList.add('employee-summary');
-      div.innerText = `${name}: ${data.days} days`;
+      div.innerText = `${name} (${data.team} team): ${data.days} days`;
       summary.appendChild(div);
     }
-  }
-
-  function resetCalendar() {
-    for (const key in employees) {
-      employees[key].days = 0;
-    }
-    const dayElements = document.querySelectorAll('.day');
-    dayElements.forEach(day => {
-      day.classList.remove('holiday', 'vacation-full', 'vacation-half');
-    });
-    updateSummary();
   }
 
   createCalendar(2025);
