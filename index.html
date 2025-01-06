@@ -293,6 +293,29 @@ async function saveVacationData(updatedData) {
   return result;
 }
 
+// Fetch vacation data from Netlify function
+async function getVacationData() {
+  const response = await fetch('/.netlify/functions/vacationData');
+  const data = await response.json();
+  return data;
+}
+
+// Send updated vacation data to Netlify function
+async function saveVacationData(updatedData) {
+  const response = await fetch('/.netlify/functions/vacationData', {
+    method: 'POST',
+    headers: {
+      'Content-Type': 'application/json',
+    },
+    body: JSON.stringify(updatedData),
+  });
+
+  const result = await response.json();
+  return result;
+}
+
+
+
 // Example of how you'd update the data
 const updatedData = { 'Thea': { days: 2, team: 'Italy' } };
 saveVacationData(updatedData).then(response => console.log('Data saved:', response));
