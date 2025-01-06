@@ -99,7 +99,7 @@
 
 <div class="legend">
   <h3>Legend</h3>
-  <div class="legend-item"><span style="background-color: #ffcccb; padding: 2px 6px;">H</span> - Preset Holiday</div>
+  <div class="legend-item"><span style="background-color: #ffcccb; padding: 2px 6px;">H</span> - Holiday</div>
   <div class="legend-item"><span style="background-color: #a3e4d7; padding: 2px 6px;">V</span> - Full Vacation Day</div>
   <div class="legend-item"><span style="background-color: #f9e79f; padding: 2px 6px;">V1</span> - Morning Half-Day Vacation</div>
   <div class="legend-item"><span style="background-color: #f9e79f; padding: 2px 6px;">V2</span> - Afternoon Half-Day Vacation</div>
@@ -107,19 +107,19 @@
 
 <script>
   const employees = {
-    'Thea': { team: 'Italy', days: 0 },
-    'Isabella': { team: 'Italy', days: 0 },
-    'LA': { team: 'US', days: 0 },
-    'Linda': { team: 'US', days: 0 },
-    'Talia': { team: 'US', days: 0 }
+    'Thea': { days: 0 },
+    'Isabella': { days: 0 },
+    'LA': { days: 0 },
+    'Linda': { days: 0 },
+    'Talia': { days: 0 }
   };
 
   const teamHolidays = {
     Italy: [
-      '2025-01-01', '2025-04-25', '2025-12-25', '2025-06-02', '2025-08-15' // Example holidays for Italy
+      '2025-01-01', '2025-04-25', '2025-12-25', '2025-06-02', '2025-08-15'
     ],
     US: [
-      '2025-07-04', '2025-11-27', '2025-12-25', '2025-01-20', '2025-05-27' // Example holidays for US
+      '2025-07-04', '2025-11-27', '2025-12-25', '2025-01-20', '2025-05-27'
     ]
   };
 
@@ -131,20 +131,16 @@
       const firstDay = new Date(year, month, 1);
       const daysInMonth = new Date(year, month + 1, 0).getDate();
 
-      // Create month container
       const monthDiv = document.createElement('div');
       monthDiv.classList.add('month');
 
-      // Add month header
       const monthHeader = document.createElement('div');
       monthHeader.classList.add('month-header');
       monthHeader.innerText = firstDay.toLocaleString('default', { month: 'long' }) + ` ${year}`;
       monthDiv.appendChild(monthHeader);
 
-      // Create table
       const table = document.createElement('table');
 
-      // Create header row
       const thead = document.createElement('thead');
       const headerRow = document.createElement('tr');
       const nameHeader = document.createElement('th');
@@ -159,7 +155,6 @@
       thead.appendChild(headerRow);
       table.appendChild(thead);
 
-      // Create body rows for employees
       const tbody = document.createElement('tbody');
       for (const [name, data] of Object.entries(employees)) {
         const row = document.createElement('tr');
@@ -174,17 +169,11 @@
           cell.dataset.name = name;
           cell.dataset.code = '';
 
-          // Mark team-specific preset holidays
-          if (data.team === 'Italy' && teamHolidays.Italy.includes(date)) {
-            cell.classList.add('holiday');
-            cell.dataset.code = 'H';
-          } else if (data.team === 'US' && teamHolidays.US.includes(date)) {
+          if (teamHolidays.Italy.includes(date) || teamHolidays.US.includes(date)) {
             cell.classList.add('holiday');
             cell.dataset.code = 'H';
           } else {
-            cell.addEventListener('mousedown', handleDaySelectionStart);
-            cell.addEventListener('mouseover', handleDaySelectionHover);
-            cell.addEventListener('mouseup', handleDaySelectionEnd);
+            cell.addEventListener('click', handleDayClick);
           }
 
           row.appendChild(cell);
@@ -199,51 +188,42 @@
     updateSummary();
   }
 
-  let isSelecting = false;
-  let selectedCells = [];
+  function handleDayClick(event) {
+    const cell = event.target;
+    const name = cell.dataset.name;
 
-  function handleDaySelectionStart(event) {
-    if (event.buttons === 1) { // Left mouse button only
-      isSelecting = true;
-      selectedCells = [event.target];
-      event.target.classList.add('selected');
-    }
-  }
-
-  function handleDaySelectionHover(event) {
-    if (isSelecting) {
-      selectedCells.push(event.target);
-      event.target.classList.add('selected');
-    }
-  }
-
-  function handleDaySelectionEnd() {
-  if (isSelecting) {
-    isSelecting = false;
-    selectedCells.forEach(cell => {
-        if (!cell.classList.contains('holiday')) {
-          const name = cell.dataset.name;
-          const type = prompt('Enter "V" for full day, "V1" for morning half, or "V2" for afternoon half:');
-          if (type === 'V') {
-            cell.classList.add('full');
-            cell.dataset.code = 'V';
-            employees[name].days += 1;
-          } else if (type === 'V1') {
-            cell.classList.add('half');
-            cell.dataset.code = 'V1';
-            employees[name].days += 0.5;
-          } else if (type === 'V2') {
-            cell.classList.add('half');
-            cell.dataset.code = 'V2';
-            employees[name].days += 0.5;
+    if (employees[name]) {
+      if (cell.classList.contains('full') || cell.classList.contains('half')) {
+        if (confirm(`Are you sure you want to cancel ${name}'s vacation day?`)) {
+          if (cell.classList.contains('full')) {
+            employees[name].days -= 1;
           } else {
-            alert('Invalid input. No changes made.');
+            employees[name].days -= 0.5;
           }
+          cell.classList.remove('full', 'half');
+          cell.dataset.code = '';
         }
-      });
-      selectedCells = [];
-      updateSummary();
+      } else {
+        const type = prompt('Enter "V" for full day, "V1" for morning half, or "V2" for afternoon half:');
+        if (type === 'V') {
+          cell.classList.add('full');
+          cell.dataset.code = 'V';
+          employees[name].days += 1;
+        } else if (type === 'V1') {
+          cell.classList.add('half');
+          cell.dataset.code = 'V1';
+          employees[name].days += 0.5;
+        } else if (type === 'V2') {
+          cell.classList.add('half');
+          cell.dataset.code = 'V2';
+          employees[name].days += 0.5;
+        } else {
+          alert('Invalid input. No changes made.');
+        }
+      }
     }
+
+    updateSummary();
   }
 
   function updateSummary() {
@@ -252,7 +232,7 @@
     for (const [name, data] of Object.entries(employees)) {
       const div = document.createElement('div');
       div.classList.add('employee-summary');
-      div.innerText = `${name} (${data.team} team): ${data.days} days`;
+      div.innerText = `${name}: ${data.days} days`;
       summary.appendChild(div);
     }
   }
@@ -261,5 +241,3 @@
 </script>
 </body>
 </html>
-
-
