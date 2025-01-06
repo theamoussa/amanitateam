@@ -9,26 +9,28 @@
       font-family: Arial, sans-serif;
       background-color: #f9f9f9;
       margin: 0;
-      padding: 20px;
+      padding: 10px;
+      font-size: 12px;
     }
     h1 {
       text-align: center;
       color: #333;
+      font-size: 18px;
     }
     .month {
-      margin: 20px 0;
+      margin: 10px 0;
       border: 1px solid #ddd;
-      border-radius: 8px;
+      border-radius: 5px;
       background-color: #fff;
       box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
       overflow: hidden;
     }
     .month-header {
       background-color: #f0f0f0;
-      padding: 10px;
+      padding: 5px;
       text-align: center;
-      font-size: 18px;
-      font-weight: bold;
+      font-size: 14px;
+      font-weight: normal;
     }
     table {
       width: 100%;
@@ -37,14 +39,15 @@
     th, td {
       border: 1px solid #ddd;
       text-align: center;
-      padding: 8px;
+      padding: 5px;
     }
     th {
       background-color: #f7f7f7;
+      font-weight: normal;
     }
     td {
+      height: 30px;
       cursor: pointer;
-      position: relative;
     }
     td.full {
       background-color: #a3e4d7;
@@ -59,33 +62,29 @@
     td.weekend {
       background-color: #e0e0e0;
     }
-    td::after {
-      content: attr(data-code);
-      display: inline-block;
-      margin-left: 5px;
-    }
     .summary {
-      margin: 20px auto;
-      max-width: 900px;
+      margin: 10px auto;
+      max-width: 600px;
       background-color: #fff;
-      padding: 20px;
-      border-radius: 8px;
+      padding: 10px;
+      border-radius: 5px;
       box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
     }
     .employee-summary {
-      margin-bottom: 10px;
-      font-size: 16px;
+      margin-bottom: 5px;
+      font-size: 12px;
     }
     .legend {
-      margin-top: 20px;
-      padding: 10px;
+      margin-top: 10px;
+      padding: 5px;
       border: 1px solid #ddd;
-      border-radius: 8px;
+      border-radius: 5px;
       background-color: #fff;
       box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
     }
     .legend-item {
       margin: 5px 0;
+      font-size: 12px;
     }
   </style>
 </head>
@@ -110,19 +109,23 @@
 
 <script>
   const employees = {
-    'Thea': { days: 0 },
-    'Isabella': { days: 0 },
-    'LA': { days: 0 },
-    'Linda': { days: 0 },
-    'Talia': { days: 0 }
+    'Thea': { days: 0, team: 'Italy' },
+    'Isabella': { days: 0, team: 'Italy' },
+    'LA': { days: 0, team: 'US' },
+    'Linda': { days: 0, team: 'US' },
+    'Talia': { days: 0, team: 'US' }
   };
 
   const teamHolidays = {
     Italy: [
-      '2025-01-01', '2025-01-02', '2025-01-06', '2025-04-21', '2025-04-22', '2025-04-23', '2025-04-24', '2025-04-25', '2025-05-01', '2025-08-11', '2025-08-12', '2025-08-13', '2025-08-14', '2025-08-15', '2025-12-22', '2025-12-23', '2025-12-24', '2025-12-25', '2025-12-26', '2025-12-29', '2025-12-30', '2025-12-31'
+      '2025-01-01', '2025-01-02', '2025-01-06', '2025-04-21', '2025-04-22', '2025-04-23', '2025-04-24', '2025-04-25',
+      '2025-05-01', '2025-08-11', '2025-08-12', '2025-08-13', '2025-08-14', '2025-08-15', '2025-12-22', '2025-12-23',
+      '2025-12-24', '2025-12-25', '2025-12-26', '2025-12-29', '2025-12-30', '2025-12-31'
     ],
     US: [
-      '2025-01-01', '2025-01-02', '2025-06-19', '2025-07-03', '2025-07-04', '2025-07-05', '2025-08-12', '2025-08-13', '2025-08-14', '2025-08-15', '2025-08-16', '2025-11-26', '2025-11-27', '2025-11-28', '2025-11-29', '2025-12-23', '2025-12-24', '2025-12-25', '2025-12-26', '2025-12-27', '2025-12-30', '2025-12-31'
+      '2025-01-01', '2025-01-02', '2025-06-19', '2025-07-03', '2025-07-04', '2025-07-05', '2025-08-12', '2025-08-13',
+      '2025-08-14', '2025-08-15', '2025-08-16', '2025-11-26', '2025-11-27', '2025-11-28', '2025-11-29', '2025-12-23',
+      '2025-12-24', '2025-12-25', '2025-12-26', '2025-12-27', '2025-12-30', '2025-12-31'
     ]
   };
 
@@ -139,23 +142,36 @@
 
       const monthHeader = document.createElement('div');
       monthHeader.classList.add('month-header');
-      monthHeader.innerText = firstDay.toLocaleString('default', { month: 'long' }) + ` ${year}`;
+      monthHeader.innerText = firstDay.toLocaleString('default', { month: 'long' }).toUpperCase() + ` ${year}`;
       monthDiv.appendChild(monthHeader);
 
       const table = document.createElement('table');
 
       const thead = document.createElement('thead');
-      const headerRow = document.createElement('tr');
-      const nameHeader = document.createElement('th');
-      nameHeader.innerText = 'Employee';
-      headerRow.appendChild(nameHeader);
 
-      ['Sun', 'Mon', 'Tue', 'Wed', 'Thu', 'Fri', 'Sat'].forEach(day => {
-        const dayHeader = document.createElement('th');
-        dayHeader.innerText = day;
-        headerRow.appendChild(dayHeader);
-      });
-      thead.appendChild(headerRow);
+      // Add row for day numbers
+      const dayNumberRow = document.createElement('tr');
+      const emptyHeader1 = document.createElement('th');
+      dayNumberRow.appendChild(emptyHeader1);
+      for (let day = 1; day <= daysInMonth; day++) {
+        const dayNumberHeader = document.createElement('th');
+        dayNumberHeader.innerText = day;
+        dayNumberRow.appendChild(dayNumberHeader);
+      }
+      thead.appendChild(dayNumberRow);
+
+      // Add row for weekdays
+      const weekdayRow = document.createElement('tr');
+      const emptyHeader2 = document.createElement('th');
+      weekdayRow.appendChild(emptyHeader2);
+      for (let day = 1; day <= daysInMonth; day++) {
+        const weekdayHeader = document.createElement('th');
+        const weekday = new Date(year, month, day).toLocaleString('default', { weekday: 'short' }).toUpperCase();
+        weekdayHeader.innerText = weekday;
+        weekdayRow.appendChild(weekdayHeader);
+      }
+      thead.appendChild(weekdayRow);
+
       table.appendChild(thead);
 
       const tbody = document.createElement('tbody');
@@ -166,11 +182,10 @@
         row.appendChild(nameCell);
 
         for (let day = 1; day <= daysInMonth; day++) {
-          const date = `${year}-${month + 1}-${day}`.replace(/-(\d)(?!\d)/g, '-0$1');
+          const date = `${year}-${String(month + 1).padStart(2, '0')}-${String(day).padStart(2, '0')}`;
           const cell = document.createElement('td');
           cell.dataset.date = date;
           cell.dataset.name = name;
-          cell.dataset.code = '';
 
           const currentDay = new Date(year, month, day).getDay();
 
@@ -179,9 +194,9 @@
             cell.classList.add('weekend');
           }
 
-          if (teamHolidays.Italy.includes(date) || teamHolidays.US.includes(date)) {
+          if ((data.team === 'Italy' && teamHolidays.Italy.includes(date)) ||
+              (data.team === 'US' && teamHolidays.US.includes(date))) {
             cell.classList.add('holiday');
-            cell.dataset.code = 'H';
           } else {
             cell.addEventListener('click', handleDayClick);
           }
@@ -249,7 +264,6 @@
 
   createCalendar(2025);
 </script>
+
 </body>
 </html>
-
-            
