@@ -1,12 +1,14 @@
 backend:
   name: git-gateway
-  branch: main # Replace with your main branch name
+  branch: main
+
 media_folder: "static/uploads"
 public_folder: "/uploads"
+
 collections:
-  - name: "pages"
-    label: "Pages"
-    files:
-      - label: "Calendar"
-        name: "calendar"
-        file: "data/calendar.json" # Link to editable content
+  - name: "calendar"
+    label: "Calendar"
+    file: "data/calendar.json"
+    fields:
+      - { label: "Event", name: "event", widget: "string" }
+      - { label: "Date", name: "date", widget: "datetime" }
